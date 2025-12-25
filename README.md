@@ -1,44 +1,62 @@
 # Work Report Skill
 
-Generate daily and weekly work reports from git activity across multiple repositories.
+基于 git 活动生成日报/周报，支持多仓库与项目分组。
 
-## Install
+## 安装
 
-Option 1: clone the repo into your Codex skills directory:
+### Codex CLI
+
+方式一：直接克隆到 Codex 技能目录：
 
 ```
 git clone https://github.com/leeguooooo/work-report.git ~/.codex/skills/work-report
 ```
 
-Option 2: download the release `.skill` and unzip it into `~/.codex/skills`:
+方式二：下载 release 的 `.skill` 并解压到 `~/.codex/skills`：
 
 ```
 unzip work-report.skill -d ~/.codex/skills
 ```
 
-Restart Codex after installation.
+安装完成后重启 Codex。
 
-## Configure
+### Claude Code
 
-By default the script scans `/Users/leo/tk.com`. Override with `--root` or edit
-`scripts/git_today_commits.sh` to set your preferred root path.
+Claude Code 当前不支持 `.skill` 格式的原生安装。建议：
 
-## Usage
+1. 克隆此仓库到本地任意目录。
+2. 在 Claude Code 的自定义提示/规则中粘贴 `SKILL.md` 的内容。
+3. 需要时手动运行 `scripts/git_today_commits.sh`，再把输出粘贴给 Claude Code 生成日报/周报。
 
-In Codex, ask for:
+### Cursor
 
-- Daily report: `日报` or `发日报`
-- Weekly report: `周报` or `发周报`
+Cursor 不支持 `.skill` 直接安装。建议：
 
-Script usage:
+1. 克隆此仓库到本地任意目录。
+2. 在 Cursor 的项目规则/聊天规则中粘贴 `SKILL.md` 的内容。
+3. 需要时手动运行 `scripts/git_today_commits.sh`，再把输出粘贴给 Cursor 生成日报/周报。
+
+## 配置
+
+默认扫描 `/Users/leo/tk.com`。如需修改，使用 `--root` 或编辑
+`scripts/git_today_commits.sh` 中的 `root` 变量。
+
+## 使用
+
+在 Codex 中可直接说：
+
+- 日报：`日报` 或 `发日报`
+- 周报：`周报` 或 `发周报`
+
+脚本用法：
 
 ```
 scripts/git_today_commits.sh --root /path/to/repos --period daily --group-by-repo
 ```
 
-## Output format
+## 输出格式
 
-Daily:
+日报：
 
 ```
 MM.DD 今日工作总结
@@ -47,7 +65,7 @@ MM.DD 今日工作总结
 2.<item>
 ```
 
-Weekly:
+周报：
 
 ```
 MM.DD-MM.DD 本周工作总结

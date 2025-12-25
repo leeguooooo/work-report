@@ -7,7 +7,7 @@ Generate daily and weekly work reports from git activity across multiple reposit
 Option 1: clone the repo into your Codex skills directory:
 
 ```
-git clone https://github.com/<owner>/work-report.git ~/.codex/skills/work-report
+git clone https://github.com/leeguooooo/work-report.git ~/.codex/skills/work-report
 ```
 
 Option 2: download the release `.skill` and unzip it into `~/.codex/skills`:

@@ -38,8 +38,12 @@ Cursor 不支持 `.skill` 直接安装。建议：
 
 ## 配置
 
-默认扫描 `/Users/leo/tk.com`。如需修改，使用 `--root` 或编辑
-`scripts/git_today_commits.sh` 中的 `root` 变量。
+重要提示：默认扫描路径是 `/Users/leo/tk.com`，请务必改成你自己的工作目录。
+
+修改方式：
+
+1) 命令行传参：`--root /path/to/your/workspace`
+2) 直接编辑脚本：修改 `scripts/git_today_commits.sh` 中的 `root` 变量
 
 ## 使用
 

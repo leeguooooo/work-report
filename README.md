@@ -53,6 +53,8 @@ scripts/git_today_commits.sh --root /path/to/your/workspace
 - 日报：`日报` 或 `发日报`
 - 周报：`周报` 或 `发周报`
 
+输出时应使用中文条目；若提交信息为英文，请改写/翻译为中文后再生成日报/周报。
+
 脚本用法：
 
 ```

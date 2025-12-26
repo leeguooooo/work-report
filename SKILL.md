@@ -13,7 +13,7 @@ description: Write a daily or weekly work report using git commits. Use when the
 - For daily reports, collect git commit subjects by author across all repos under the target root, grouped by project (repo).
   - Prefer using `scripts/git_today_commits.sh --root <path> --period daily --group-by-repo`.
   - If needed, run manually per repo: `git log --since=midnight --author "<name>" --pretty=format:%s`.
-  - Rewrite commit subjects into concise Chinese items and then turn them into a numbered list under each project (avoid English output).
+  - Rewrite commit subjects into concise Chinese items and then turn them into a numbered list under each project (avoid English output); replace low-value or sensitive phrases (e.g., "解决冲突") with business-friendly wording (e.g., "代码集成与稳定性维护").
   - If there are no commits, ask the user for manual items.
 - For weekly reports, summarize git commits into concise Chinese items grouped by project (do not require user input unless there are no commits).
   - Prefer using `scripts/git_today_commits.sh --root <path> --period weekly --group-by-repo`.
@@ -35,6 +35,7 @@ Use `scripts/git_today_commits.sh` to list commit subjects.
 - Use `--with-repo` to prefix each item with the repo name.
 - Use `--group-by-repo` to output sections grouped by repo for easier report formatting.
 - Commits are collected across all branches by default (`git log --all`). Use `--no-all` to limit to the current branch.
+- Normalization is enabled by default to make items more business-friendly; use `--no-normalize` to keep raw commit subjects.
 
 ## Output format
 

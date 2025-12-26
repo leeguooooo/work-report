@@ -9,12 +9,13 @@ since=""
 with_repo=0
 group_by_repo=0
 all=1
+normalize=1
 
 usage() {
   cat <<'USAGE'
 Usage: git_today_commits.sh [--root <path>] [--repo <path>] [--author "Name"]
                             [--period daily|weekly] [--since "expr"] [--with-repo]
-                            [--group-by-repo] [--no-all]
+                            [--group-by-repo] [--no-all] [--no-normalize]
 
 Print commit subjects by author across repos (defaults to git config --global user.name).
 Only directories containing a .git folder or file are treated as repos; non-git dirs are ignored.
@@ -54,6 +55,14 @@ while [ $# -gt 0 ]; do
       ;;
     --no-all)
       all=0
+      shift 1
+      ;;
+    --no-normalize)
+      normalize=0
+      shift 1
+      ;;
+    --normalize)
+      normalize=1
       shift 1
       ;;
     -h|--help)
@@ -134,6 +143,54 @@ if [ -z "$author" ]; then
   fi
 fi
 
+normalize_line() {
+  local line="$1"
+  local cleaned=""
+  local lower=""
+
+  cleaned=$(printf '%s' "$line" | sed -E 's/^[[:space:]]*([a-zA-Z]+)(\([^)]+\))?(!)?:[[:space:]]*//; s/^[[:space:]]*\\[[^]]+\\][[:space:]]*//')
+  if [ -z "$cleaned" ]; then
+    return 0
+  fi
+
+  lower=$(printf '%s' "$cleaned" | tr '[:upper:]' '[:lower:]')
+  case "$lower" in
+    *"冲突"*|*"合并"*|*"merge"*|*"rebase"*|*"cherry-pick"*|*"conflict"*)
+      printf '%s\n' "代码集成与稳定性维护"
+      return 0
+      ;;
+    *"format"*|*"lint"*|*"ci"*|*"pipeline"*|*"workflow"*|*"格式化"*|*"规范"*)
+      printf '%s\n' "工程化与代码质量维护"
+      return 0
+      ;;
+    *"deps"*|*"dependency"*|*"bump"*|*"upgrade"*|*"依赖"*)
+      printf '%s\n' "依赖升级与安全维护"
+      return 0
+      ;;
+    *"refactor"*|*"重构"*)
+      printf '%s\n' "代码结构优化"
+      return 0
+      ;;
+    *"test"*|*"测试"*)
+      printf '%s\n' "测试完善与稳定性提升"
+      return 0
+      ;;
+    *"docs"*|*"readme"*|*"changelog"*|*"文档"*)
+      printf '%s\n' "文档更新与说明完善"
+      return 0
+      ;;
+    *"config"*|*"build"*|*"构建"*|*"配置"*)
+      printf '%s\n' "构建配置优化"
+      return 0
+      ;;
+  esac
+
+  cleaned=$(printf '%s' "$cleaned" | sed -E \
+    -e 's/^[Aa]dd(ing)? /新增/; s/^[Ff]ix(ing)? /修复/; s/^[Uu]pdate(d|ing)? /更新/; s/^[Rr]emove(d|ing)? /移除/; s/^[Ii]mprove(d|ment)? /优化/; s/^[Ss]upport(ed|ing)? /支持/')
+
+  printf '%s\n' "$cleaned"
+}
+
 for repo_path in "${repos[@]}"; do
   if ! git -C "$repo_path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     echo "Not a git repo: $repo_path" >&2
@@ -162,13 +219,24 @@ for repo_path in "${repos[@]}"; do
     printf '%s\n' "$(basename "$repo_path")"
     printf '%s\n' "$commits" | while IFS= read -r line; do
       if [ -n "$line" ]; then
-        printf '%s\n' "- $line"
+        if [ "$normalize" -eq 1 ]; then
+          line=$(normalize_line "$line")
+        fi
+        if [ -n "$line" ]; then
+          printf '%s\n' "- $line"
+        fi
       fi
     done
     continue
   fi
 
   printf '%s\n' "$commits" | while IFS= read -r line; do
+    if [ -z "$line" ]; then
+      continue
+    fi
+    if [ "$normalize" -eq 1 ]; then
+      line=$(normalize_line "$line")
+    fi
     if [ -z "$line" ]; then
       continue
     fi

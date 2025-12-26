@@ -9,7 +9,7 @@ description: Write a daily or weekly work report using git commits. Use when the
 
 - Determine local date and format as `MM.DD` (no year).
 - Decide daily vs weekly based on the user's request.
-- For daily reports, collect git commit subjects by author across all repos under `/Users/leo/tk.com`, grouped by project (repo).
+- For daily reports, collect git commit subjects by author across all repos under the target root, grouped by project (repo).
   - Prefer using `scripts/git_today_commits.sh`.
   - If needed, run manually per repo: `git log --since=midnight --author "<name>" --pretty=format:%s`.
   - Turn commit subjects into a numbered list under each project.
@@ -17,13 +17,13 @@ description: Write a daily or weekly work report using git commits. Use when the
 - For weekly reports, summarize git commits into concise Chinese items grouped by project (do not require user input unless there are no commits).
   - Prefer using `scripts/git_today_commits.sh --period weekly --group-by-repo`.
   - Convert commit subjects into 1-5 Chinese summary items per project (merge similar changes).
-- Only treat directories with a `.git` folder as projects. Ignore non-git directories. Include nested repos under the root.
+- Only treat directories with a `.git` folder or file as projects. Ignore non-git directories. Include nested repos under the root.
 
 ## Script
 
 Use `scripts/git_today_commits.sh` to list commit subjects.
 
-- Default root is `/Users/leo/tk.com`.
+- `--root <path>` is required unless `--repo` is provided.
 - Default author comes from `git config --global user.name`, then `git config --global user.email`.
 - Use `--root <path>` to target a different root folder.
 - Use `--repo <path>` to target a single repo.
@@ -32,10 +32,11 @@ Use `scripts/git_today_commits.sh` to list commit subjects.
 - Use `--since "<expr>"` to override the time range (e.g., "yesterday").
 - Use `--with-repo` to prefix each item with the repo name.
 - Use `--group-by-repo` to output sections grouped by repo for easier report formatting.
+- Commits are collected across all branches by default (`git log --all`). Use `--no-all` to limit to the current branch.
 
 ## Output format
 
-Use "今日工作总结" as the header text for daily reports.
+Use "今日工作总结" as the header text for daily reports. When the script outputs bullets, convert them into a numbered list.
 
 ```
 MM.DD 今日工作总结
@@ -46,7 +47,7 @@ MM.DD 今日工作总结
 1.<item>
 ```
 
-Use "本周工作总结" as the header text for weekly reports. Weekly items are a Chinese summary derived from git commits.
+Use "本周工作总结" as the header text for weekly reports. Weekly items are a Chinese summary derived from git commits. The time range should follow the natural week starting Monday.
 
 ```
 MM.DD-MM.DD 本周工作总结

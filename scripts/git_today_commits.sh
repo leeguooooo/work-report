@@ -1,22 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-root="/Users/leo/tk.com"
+root=""
 repo=""
 author=""
 period="daily"
 since=""
 with_repo=0
 group_by_repo=0
+all=1
 
 usage() {
   cat <<'USAGE'
 Usage: git_today_commits.sh [--root <path>] [--repo <path>] [--author "Name"]
                             [--period daily|weekly] [--since "expr"] [--with-repo]
-                            [--group-by-repo]
+                            [--group-by-repo] [--no-all]
 
 Print commit subjects by author across repos (defaults to git config --global user.name).
-Only directories containing a .git folder are treated as repos; non-git dirs are ignored.
+Only directories containing a .git folder or file are treated as repos; non-git dirs are ignored.
 USAGE
 }
 
@@ -50,6 +51,10 @@ while [ $# -gt 0 ]; do
       group_by_repo=1
       shift 1
       ;;
+    --no-all)
+      all=0
+      shift 1
+      ;;
     -h|--help)
       usage
       exit 0
@@ -65,7 +70,18 @@ done
 if [ -z "$since" ]; then
   case "$period" in
     daily) since="midnight" ;;
-    weekly) since="1 week ago" ;;
+    weekly)
+      if date -v-0d +%Y-%m-%d >/dev/null 2>&1; then
+        dow=$(date +%u)
+        offset=$((dow - 1))
+        since=$(date -v-"${offset}"d +%Y-%m-%d)
+      else
+        dow=$(date +%u)
+        offset=$((dow - 1))
+        since=$(date -d "-${offset} day" +%Y-%m-%d)
+      fi
+      since="${since} 00:00"
+      ;;
     *)
       echo "Unknown period: $period" >&2
       exit 1
@@ -77,9 +93,17 @@ repos=()
 if [ -n "$repo" ]; then
   repos=("$repo")
 else
-  while IFS= read -r gitdir; do
-    repos+=("$(dirname "$gitdir")")
-  done < <(find "$root" -name .git -type d -prune)
+  if [ -z "$root" ]; then
+    echo "Missing --root (or use --repo for a single repo)." >&2
+    exit 1
+  fi
+  if [ ! -d "$root" ]; then
+    echo "Root path not found: $root" >&2
+    exit 1
+  fi
+  while IFS= read -r -d '' gitpath; do
+    repos+=("$(dirname "$gitpath")")
+  done < <(find "$root" \( -name .git -type d -prune -print0 \) -o \( -name .git -type f -print0 \))
 fi
 
 if [ ${#repos[@]} -eq 0 ]; then
@@ -111,10 +135,15 @@ for repo_path in "${repos[@]}"; do
     continue
   fi
 
+  all_flag=""
+  if [ "$all" -eq 1 ]; then
+    all_flag="--all"
+  fi
+
   if [ -n "$author" ]; then
-    commits=$(git -C "$repo_path" log --since="$since" --author="$author" --pretty=format:%s)
+    commits=$(git -C "$repo_path" log $all_flag --since="$since" --author="$author" --pretty=format:%s)
   else
-    commits=$(git -C "$repo_path" log --since="$since" --pretty=format:%s)
+    commits=$(git -C "$repo_path" log $all_flag --since="$since" --pretty=format:%s)
   fi
 
   if [ -z "$commits" ]; then

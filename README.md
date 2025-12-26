@@ -38,12 +38,13 @@ Cursor 不支持 `.skill` 直接安装。建议：
 
 ## 配置
 
-重要提示：默认扫描路径是 `/Users/leo/tk.com`，请务必改成你自己的工作目录。
+重要提示：需要显式提供扫描目录 `--root`（或使用 `--repo` 指定单仓库），否则脚本会报错。
 
-修改方式：
+示例：
 
-1) 命令行传参：`--root /path/to/your/workspace`
-2) 直接编辑脚本：修改 `scripts/git_today_commits.sh` 中的 `root` 变量
+```
+scripts/git_today_commits.sh --root /path/to/your/workspace
+```
 
 ## 使用
 
@@ -57,6 +58,12 @@ Cursor 不支持 `.skill` 直接安装。建议：
 ```
 scripts/git_today_commits.sh --root /path/to/repos --period daily --group-by-repo
 ```
+
+说明：
+
+- 只会统计包含 `.git` 目录或文件的项目，非 git 目录会被忽略
+- 默认使用 `git log --all`，跨分支收集提交（可用 `--no-all` 限制为当前分支）
+- `--period weekly` 使用自然周（周一开始）作为时间范围
 
 ## 输出格式
 

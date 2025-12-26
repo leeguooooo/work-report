@@ -9,7 +9,7 @@ description: Write a daily or weekly work report using git commits. Use when the
 
 - Determine local date and format as `MM.DD` (no year).
 - Decide daily vs weekly based on the user's request.
-- Confirm the workspace root path for scanning multiple repos; if the user hasn't provided one, ask for it instead of defaulting to the current repo.
+- Confirm the workspace root path for scanning multiple repos; if the user hasn't provided one, first check WORK_REPORT_ROOT or CODEX_WORK_ROOT, then ask.
 - For daily reports, collect git commit subjects by author across all repos under the target root, grouped by project (repo).
   - Prefer using `scripts/git_today_commits.sh --root <path> --period daily --group-by-repo`.
   - If needed, run manually per repo: `git log --since=midnight --author "<name>" --pretty=format:%s`.
@@ -25,7 +25,7 @@ description: Write a daily or weekly work report using git commits. Use when the
 Use `scripts/git_today_commits.sh` to list commit subjects.
 
 - If you're not in this skill directory, call it via `~/.codex/skills/work-report/scripts/git_today_commits.sh` (or `$CODEX_HOME/skills/work-report/scripts/git_today_commits.sh`).
-- `--root <path>` is required unless `--repo` is provided.
+- `--root <path>` is required unless `--repo` is provided or WORK_REPORT_ROOT/CODEX_WORK_ROOT is set.
 - Default author comes from `git config --global user.name`, then `git config --global user.email`.
 - Use `--root <path>` to target a different root folder.
 - Use `--repo <path>` to target a single repo.

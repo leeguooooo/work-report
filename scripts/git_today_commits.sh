@@ -18,6 +18,7 @@ Usage: git_today_commits.sh [--root <path>] [--repo <path>] [--author "Name"]
 
 Print commit subjects by author across repos (defaults to git config --global user.name).
 Only directories containing a .git folder or file are treated as repos; non-git dirs are ignored.
+If --root is omitted, WORK_REPORT_ROOT or CODEX_WORK_ROOT will be used if set.
 USAGE
 }
 
@@ -94,7 +95,14 @@ if [ -n "$repo" ]; then
   repos=("$repo")
 else
   if [ -z "$root" ]; then
-    echo "Missing --root (or use --repo for a single repo)." >&2
+    if [ -n "${WORK_REPORT_ROOT:-}" ]; then
+      root="$WORK_REPORT_ROOT"
+    elif [ -n "${CODEX_WORK_ROOT:-}" ]; then
+      root="$CODEX_WORK_ROOT"
+    fi
+  fi
+  if [ -z "$root" ]; then
+    echo "Missing --root (or use --repo, or set WORK_REPORT_ROOT/CODEX_WORK_ROOT)." >&2
     exit 1
   fi
   if [ ! -d "$root" ]; then

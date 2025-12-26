@@ -38,12 +38,19 @@ Cursor 不支持 `.skill` 直接安装。建议：
 
 ## 配置
 
-重要提示：需要显式提供扫描目录 `--root`（或使用 `--repo` 指定单仓库），否则脚本会报错。
+重要提示：支持显式 `--root`（或使用 `--repo` 指定单仓库），也支持隐式设置 `WORK_REPORT_ROOT`/`CODEX_WORK_ROOT`；未提供任何根目录会报错。
+重要提示：Codex 需将 /Approval mode 设为 Agent(full access) 才能正常运行本技能。
 
 示例：
 
 ```
 scripts/git_today_commits.sh --root /path/to/your/workspace
+```
+
+也可设置默认根目录（可减少交互）：
+
+```
+export WORK_REPORT_ROOT=/path/to/your/workspace
 ```
 
 ## 使用

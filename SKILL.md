@@ -37,6 +37,14 @@ Use `scripts/git_today_commits.sh` to list commit subjects.
 - Commits are collected across all branches by default (`git log --all`). Use `--no-all` to limit to the current branch.
 - Normalization is enabled by default to make items more business-friendly; use `--no-normalize` to keep raw commit subjects.
 
+## ZenTao bug ids
+
+Commits and PRs that fix a ZenTao (禅道) bug carry its id: `（禅道 #8874）` at the end of the subject, and `zt8874` in the branch name (a merge commit only has the branch name). Keep these ids in the report so readers can trace each item back to its bug.
+
+- The script extracts ids from `禅道 #<n>` in subjects and `zt<n>` in branch names, and appends `（禅道 #8874）` to the item, in both normalized and `--no-normalize` output. Multiple ids become `（禅道 #8874 #8875）`.
+- When rewriting items into Chinese, keep the `（禅道 #…）` suffix verbatim at the end of the line. When merging several commits into one item, merge their ids into one suffix.
+- Do not invent ids; only show ids that come from the commits.
+
 ## Output format
 
 Use "今日工作总结" as the header text for daily reports. When the script outputs bullets, convert them into a numbered list.
@@ -45,7 +53,7 @@ Use "今日工作总结" as the header text for daily reports. When the script o
 MM.DD 今日工作总结
 <项目A>
 1.<item>
-2.<item>
+2.<item>（禅道 #8874）
 <项目B>
 1.<item>
 ```

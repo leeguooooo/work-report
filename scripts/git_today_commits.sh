@@ -143,7 +143,37 @@ if [ -z "$author" ]; then
   fi
 fi
 
+# 禅道 bug 号：提交标题里的「禅道 #8874」或分支名里的 zt8874（合并提交只有分支名）。
+# 归一化会把整条换成套话，所以先抽出来，最后统一接成「（禅道 #8874）」。
+zentao_ids() {
+  printf '%s' "$1" | grep -oE '[（(]禅道[^）)]*[）)]|禅道[[:space:]]*#?[0-9]+|(^|[^[:alnum:]])zt[0-9]+' \
+    | grep -oE '[0-9]+' | awk '!seen[$0]++' | sed 's/^/#/' | paste -sd' ' - || true
+}
+
 normalize_line() {
+  local line="$1"
+  local ids=""
+  ids=$(zentao_ids "$line")
+  line=$(printf '%s' "$line" | sed -E 's/[[:space:]]*[（(]禅道[^）)]*[）)]//g')
+  local out=""
+  out=$(normalize_core "$line")
+  if [ -n "$out" ] && [ -n "$ids" ]; then
+    out="${out}（禅道 ${ids}）"
+  fi
+  if [ -n "$out" ]; then
+    printf '%s\n' "$out"
+  fi
+}
+
+# --no-normalize 时保留原标题，只给「标题里没写、分支名里有」的补上号（合并提交）
+tag_raw_line() {
+  local line="$1" ids=""
+  case "$line" in *"禅道"*) printf '%s\n' "$line"; return 0 ;; esac
+  ids=$(zentao_ids "$line")
+  if [ -n "$ids" ]; then printf '%s\n' "${line}（禅道 ${ids}）"; else printf '%s\n' "$line"; fi
+}
+
+normalize_core() {
   local line="$1"
   local cleaned=""
   local lower=""
@@ -221,6 +251,8 @@ for repo_path in "${repos[@]}"; do
       if [ -n "$line" ]; then
         if [ "$normalize" -eq 1 ]; then
           line=$(normalize_line "$line")
+        else
+          line=$(tag_raw_line "$line")
         fi
         if [ -n "$line" ]; then
           printf '%s\n' "- $line"
@@ -236,6 +268,8 @@ for repo_path in "${repos[@]}"; do
     fi
     if [ "$normalize" -eq 1 ]; then
       line=$(normalize_line "$line")
+    else
+      line=$(tag_raw_line "$line")
     fi
     if [ -z "$line" ]; then
       continue

@@ -24,7 +24,7 @@ description: Write a daily or weekly work report using git commits. Use when the
 
 Use `scripts/git_today_commits.sh` to list commit subjects.
 
-- If you're not in this skill directory, call it via `~/.codex/skills/work-report/scripts/git_today_commits.sh` (or `$CODEX_HOME/skills/work-report/scripts/git_today_commits.sh`).
+- If you're not in this skill directory, call it from wherever the skill is installed: `~/.claude/skills/work-report/scripts/git_today_commits.sh`, `~/.agents/skills/work-report/scripts/git_today_commits.sh`, or `~/.codex/skills/work-report/scripts/git_today_commits.sh` (`$CODEX_HOME/skills/...`).
 - `--root <path>` is required unless `--repo` is provided or WORK_REPORT_ROOT/CODEX_WORK_ROOT is set.
 - Default author comes from `git config --global user.name`, then `git config --global user.email`.
 - Use `--root <path>` to target a different root folder.
